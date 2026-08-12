@@ -682,6 +682,20 @@
     .resume-grid { grid-template-columns: 1fr; gap: 36px; }
   }
   @media (max-width: 768px) {
+    /* 手机端首屏背景增强：紫色极光光晕 + 波浪带更明显 */
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(120% 55% at 15% 8%, rgba(168,85,247,0.16), transparent 62%),
+        radial-gradient(100% 50% at 88% 24%, rgba(192,132,252,0.10), transparent 62%),
+        radial-gradient(140% 60% at 50% 105%, rgba(124,58,237,0.26), transparent 70%);
+    }
+    .hero-band { height: 100%; opacity: 0.55; }
+    .hero-bottom-fade {
+      background: linear-gradient(to bottom, transparent 36%, rgba(5,5,8,0.55) 70%, var(--bg) 100%);
+    }
+    .dotfield { opacity: 0.4; }
     nav { padding: 0 20px; }
     nav#navbar { top: 12px; width: calc(100% - 24px); padding: 5px; }
     nav#navbar.scrolled { width: calc(100% - 24px); }
@@ -1619,7 +1633,12 @@
           rotation: 90, fadeTop: 0.78, iterations: 1, intensity: 1.4,
           scale: 1, warpStrength: 1, yOffset: 0.3, mouseInfluence: 0.3
         };
-        var rotRad = BAND.rotation * Math.PI / 180;
+        /* 电脑端竖向纹理不变；手机端切换为横向纹理 */
+        var rotRad = 0;
+        function updateBandRotation() {
+          rotRad = (window.innerWidth <= 768 ? 0 : BAND.rotation) * Math.PI / 180;
+        }
+        updateBandRotation();
         var bandTime = 0;
         var lastBand = 0;
         var ptrTarget = { x: 0, y: 0 };
@@ -1676,7 +1695,7 @@
 
         window.addEventListener('resize', function () {
           clearTimeout(bandResizeTimer);
-          bandResizeTimer = setTimeout(resizeBand, 100);
+          bandResizeTimer = setTimeout(function () { resizeBand(); updateBandRotation(); }, 100);
         });
       }
     } else {
